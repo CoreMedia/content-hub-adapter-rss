@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
-      <version>1.18.0</version>
+      <version>1.19.0</version>
       <licenses>
         <license>
           <name>The Apache Software License, Version 2.0</name>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome-modules</artifactId>
-      <version>1.18.0</version>
+      <version>1.19.0</version>
       <licenses>
         <license>
           <name>The Apache Software License, Version 2.0</name>
@@ -42,33 +42,33 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
+      <version>3.13.0</version>
       <licenses>
         <license>
-          <name>Apache License, Version 2.0</name>
+          <name>Apache-2.0</name>
           <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
           <distribution>repo</distribution>
-          <file>apache license, version 2.0 - license-2.0.txt</file>
+          <file>apache-2.0 - license-2.0.txt</file>
         </license>
       </licenses>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.16.1</version>
+      <version>3.24.2</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
           <distribution>repo</distribution>
-          <file>the apache software license, version 2.0 - license-2.0.txt</file>
+          <file>apache-2.0 - license-2.0.txt</file>
         </license>
       </licenses>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.7.0-RC1</version>
+      <version>5.10.0</version>
       <licenses>
         <license>
           <name>Eclipse Public License v2.0</name>
@@ -80,11 +80,11 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.5.7</version>
+      <version>3.12.4</version>
       <licenses>
         <license>
           <name>The MIT License</name>
-          <url>https://github.com/mockito/mockito/blob/master/LICENSE</url>
+          <url>https://github.com/mockito/mockito/blob/main/LICENSE</url>
           <distribution>repo</distribution>
           <file>the mit license - license.txt</file>
         </license>
@@ -93,7 +93,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.32</version>
+      <version>1.7.36</version>
       <licenses>
         <license>
           <name>MIT License</name>
@@ -106,7 +106,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>5.3.14</version>
+      <version>5.3.31</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
@@ -119,7 +119,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>5.3.14</version>
+      <version>5.3.31</version>
       <licenses>
         <license>
           <name>Apache License, Version 2.0</name>
