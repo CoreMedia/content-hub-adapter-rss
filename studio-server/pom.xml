@@ -81,17 +81,17 @@
     <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
-      <version>1.18.0</version>
+      <version>1.19.0</version>
     </dependency>
     <dependency>
       <groupId>com.rometools</groupId>
       <artifactId>rome-modules</artifactId>
-      <version>1.18.0</version>
+      <version>1.19.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>3.12.0</version>
+      <version>3.13.0</version>
     </dependency>
 
     <dependency>
@@ -102,6 +102,11 @@
     <dependency>
       <groupId>com.coremedia.cms</groupId>
       <artifactId>coremedia-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.coremedia.cms</groupId>
+      <artifactId>coremedia-xml</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -129,19 +134,19 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>5.7.0-RC1</version>
+      <version>5.10.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>3.5.7</version>
+      <version>3.12.4</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.16.1</version>
+      <version>3.24.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -151,13 +156,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.6.0</version>
         <configuration>
           <ignoredDependencies>
             <!-- JUnit Jupiter: Use Aggregator rather than API/Engine Artifacts directly -->
