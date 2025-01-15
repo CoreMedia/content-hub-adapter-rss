@@ -53,7 +53,19 @@ In short, for a quick development roundtrip:
    and copy `content-hub-adapter-rss/studio-server/target/studio-server.content-hub-adapter-rss-<version>.zip`
    into that directory.
 4. Start the studio server as usual, e.g. `mvn spring-boot:run`, with an additional property `-Dplugins.directories=/tmp/studio-server-plugins`
-5. Start the studio client with an additional property `-DadditionalPackagesDirs=/.../content-hub-adapter-rss/studio-client/target/app`
+5. In your Blueprint studio-client workspace, there is a file `apps/studio-client/apps/main/app/jangaroo.config.js`,
+   which contains a structure like
+   ```
+   module.exports = jangarooConfig({
+     additionalPackagesDirs: [
+       "./build/additional-packages",
+     ],
+     ...
+   });
+   ```
+   Add the absolute path of the `content-hub-adapter-rss/studio-client/apps/main/content-hub-adapter-rss` directory
+   (see step 2.2.) to the `additionalPackagesDirs` list.
+6. Start the studio client as usual.
 
 Now the plugin is running.  You won't yet notice it though, until you configure a connection
 and restart the studio server.
