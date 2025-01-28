@@ -9,15 +9,16 @@
 ## Table of Content
 
 1. [Introduction](#introduction)
-1. [Use Git](#use-git)
-2. [Download Release](#download-release)
-3. [Activate the Plugin](#activate-the-plugin)
-4. [Intellij IDEA Hints](#intellij-idea-hints)
+2. [Use Git](#use-git)
+3. [Download Release](#download-release)
+4. [Activate the Plugin](#activate-the-plugin)
+5. [Intellij IDEA Hints](#intellij-idea-hints)
 
 ## Introduction
 
 Depending on your setup and your plans, you can integrate this project in different ways.
 
+* If the plugin is already bundled in your Blueprint version (check the `plugins.json` file of the `studio-server` app), you can immediately proceed with [Configure the Plugin](#configure-the-plugin).
 * If you want to use the plugin in your project, clone or fork the repository.
 * If you do not want to use GitHub, proceed as described in [Download Release](#download-release).
 * If you want to contribute a new feature or a bugfix, as an external developer, you need a fork of the repository to create a Pull Request.
