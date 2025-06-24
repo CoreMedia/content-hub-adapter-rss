@@ -1,14 +1,6 @@
 package com.coremedia.labs.plugins.adapters.rss;
 
-import com.coremedia.contenthub.api.ContentHubAdapter;
-import com.coremedia.contenthub.api.ContentHubContext;
-import com.coremedia.contenthub.api.ContentHubObject;
-import com.coremedia.contenthub.api.ContentHubObjectId;
-import com.coremedia.contenthub.api.ContentHubTransformer;
-import com.coremedia.contenthub.api.ContentHubType;
-import com.coremedia.contenthub.api.Folder;
-import com.coremedia.contenthub.api.GetChildrenResult;
-import com.coremedia.contenthub.api.Item;
+import com.coremedia.contenthub.api.*;
 import com.coremedia.contenthub.api.column.ColumnProvider;
 import com.coremedia.contenthub.api.exception.ContentHubException;
 import com.coremedia.contenthub.api.pagination.PaginationRequest;
@@ -29,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
@@ -41,13 +34,13 @@ import java.util.stream.Collectors;
 
 
 class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RSSContentHubAdapter.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private final RSSContentHubTransformer rssContentHubTransformer;
   private final FeedImageExtractor feedImageExtractor;
   private final RSSContentHubSettings settings;
   private final String connectionId;
-  private final SyndFeed feed;
+  private SyndFeed feed;
   private final RSSColumnProvider columnProvider;
 
   RSSContentHubAdapter(@NonNull RSSContentHubTransformer rssContentHubTransformer,
@@ -59,42 +52,6 @@ class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService
     this.settings = settings;
     this.connectionId = connectionId;
     columnProvider = new RSSColumnProvider();
-    String url = settings.getUrl();
-    if (url == null) {
-      String msg = "Error reading url for RSS stream with id:" + connectionId;
-      LOGGER.error(msg);
-      throw new ContentHubException(msg);
-    }
-
-    try {
-      String proxyHost = settings.getProxyHost();
-      String proxyType = settings.getProxyType();
-      Integer proxyPort = settings.getProxyPort();
-
-      SyndFeedInput input = new SyndFeedInput();
-
-      URL feedSource = new URL(url);
-
-      if (proxyType != null && proxyHost != null && proxyPort != null) {
-        Proxy proxy = new Proxy(Proxy.Type.valueOf(proxyType.toUpperCase()), new InetSocketAddress(proxyHost, proxyPort));
-        URLConnection urlConnection = feedSource.openConnection(proxy);
-        XmlReader.setDefaultEncoding("utf8");
-        XmlReader reader = new XmlReader(urlConnection);
-        feed = input.build(reader);
-      } else {
-        XmlReader.setDefaultEncoding("utf8");
-        XmlReader reader = new XmlReader(feedSource);
-        feed = input.build(reader);
-      }
-    } catch (Exception e) {
-      String msg = "Error reading RSS stream '" + url + "': " + e.getMessage();
-      LOGGER.error("{}, see DEBUG log for details.", msg);
-      if (LOGGER.isDebugEnabled()) {
-        String plainXML = getFeedXML(url);
-        LOGGER.debug("{}, feed XML:\n{}", msg, plainXML, e);
-      }
-      throw new ContentHubException(msg);
-    }
   }
 
   @Override
@@ -106,13 +63,13 @@ class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService
   public ContentHubSearchResult search(String term, @Nullable Folder folder, @Nullable ContentHubType contentHubType, Collection<String> collection, List<Sort> list, int limit) {
     List<ContentHubObject> collect = new ArrayList<>();
     int hits = 0;
-    List<SyndEntry> entries = feed.getEntries();
+    List<SyndEntry> entries = getFeed().getEntries();
     for (SyndEntry entry : entries) {
       ContentHubObjectId id = new ContentHubObjectId(connectionId, entry.getUri());
       if (matches(term, entry)) {
         hits++;
         if (limit <= 0 || collect.size() < limit) {
-          collect.add(new RSSItem(feedImageExtractor, id, feed, entry));
+          collect.add(new RSSItem(feedImageExtractor, id, getFeed(), entry));
         }
       }
     }
@@ -127,17 +84,17 @@ class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService
       displayName = settings.getUrl();
     }
     ContentHubObjectId rootId = new ContentHubObjectId(connectionId, connectionId);
-    return new RSSFolder(rootId, feed, displayName);
+    return new RSSFolder(rootId, getFeed(), displayName);
   }
 
   @Nullable
   @Override
   public Item getItem(@NonNull ContentHubContext context, @NonNull ContentHubObjectId id) throws ContentHubException {
-    List<SyndEntry> entries = feed.getEntries();
+    List<SyndEntry> entries = getFeed().getEntries();
     String externalId = id.getExternalId();
     for (SyndEntry entry : entries) {
       if (entry.getUri().equals(externalId)) {
-        return new RSSItem(feedImageExtractor, id, feed, entry);
+        return new RSSItem(feedImageExtractor, id, getFeed(), entry);
       }
     }
     return null;
@@ -153,10 +110,10 @@ class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService
   @Override
   public GetChildrenResult getChildren(@NonNull ContentHubContext context, @NonNull Folder folder, @Nullable PaginationRequest paginationRequest) {
     List<ContentHubObject> result = new ArrayList<>();
-    List<SyndEntry> entries = feed.getEntries();
+    List<SyndEntry> entries = getFeed().getEntries();
     for (SyndEntry entry : entries) {
       ContentHubObjectId id = new ContentHubObjectId(connectionId, entry.getUri());
-      result.add(new RSSItem(feedImageExtractor, id, feed, entry));
+      result.add(new RSSItem(feedImageExtractor, id, getFeed(), entry));
     }
     return new GetChildrenResult(result);
   }
@@ -174,6 +131,74 @@ class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService
   @NonNull
   public ContentHubTransformer transformer() {
     return rssContentHubTransformer;
+  }
+
+  @NonNull
+  private synchronized SyndFeed getFeed() {
+    if (this.feed != null) {
+      return this.feed;
+    }
+    this.feed = getFeedInternal();
+    return this.feed;
+  }
+
+  private SyndFeed getFeedInternal() {
+    String url = settings.getUrl();
+    if (url == null) {
+      String msg = "Error reading url for RSS stream with id:" + connectionId;
+      LOGGER.error(msg);
+      throw new ContentHubException(msg);
+    }
+    try {
+      String proxyHost = settings.getProxyHost();
+      String proxyType = settings.getProxyType();
+      Integer proxyPort = settings.getProxyPort();
+
+      SyndFeedInput input = new SyndFeedInput();
+
+      URL feedSource = new URL(url);
+
+      if (proxyType != null && proxyHost != null && proxyPort != null) {
+        Proxy proxy = new Proxy(Proxy.Type.valueOf(proxyType.toUpperCase()), new InetSocketAddress(proxyHost, proxyPort));
+        URLConnection urlConnection = feedSource.openConnection(proxy);
+        XmlReader.setDefaultEncoding("utf8");
+        XmlReader reader = new XmlReader(urlConnection);
+        return input.build(reader);
+      } else {
+        XmlReader.setDefaultEncoding("utf8");
+        XmlReader reader = new XmlReader(feedSource);
+        return input.build(reader);
+      }
+    } catch (Exception e) {
+      String msg = "Error reading RSS stream '" + url + "': " + e.getMessage();
+      LOGGER.error("{}, see DEBUG log for details.", msg);
+      if (LOGGER.isDebugEnabled()) {
+        String plainXML = getFeedXML(url);
+        LOGGER.debug("{}, feed XML:\n{}", msg, plainXML, e);
+      }
+      throw new ContentHubException(msg);
+    }
+  }
+  /**
+   * Just a helper to detect what went wrong when parsing RSS feed.
+   * E.g. the result may be a 301 moved permanently or contain a special character
+   * that is not parsable, even with utf8.
+   */
+  private String getFeedXML(String url) {
+    StringBuilder response = new StringBuilder();
+    try {
+      URLConnection connection = new URL(url).openConnection();
+      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+      String inputLine;
+      while ((inputLine = in.readLine()) != null) {
+        response.append(inputLine);
+        response.append(System.getProperty("line.separator"));
+      }
+      in.close();
+    } catch (Exception e) {
+      //ignore
+    }
+    return response.toString();
   }
 
 
@@ -200,28 +225,6 @@ class RSSContentHubAdapter implements ContentHubAdapter, ContentHubSearchService
       return value.toLowerCase().contains(term.toLowerCase());
     }
     return false;
-  }
-
-  /**
-   * Just a helper to detect what went wrong when parsing RSS feed.
-   * E.g. the result may be a 301 moved permanently or contain a special character
-   * that is not parsable, even with utf8.
-   */
-  private String getFeedXML(String url) {
-    StringBuilder response = new StringBuilder();
-    try {
-      URLConnection connection = new URL(url).openConnection();
-      BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-      String inputLine;
-      while ((inputLine = in.readLine()) != null) {
-        response.append(inputLine);
-        response.append(System.getProperty("line.separator"));
-      }
-      in.close();
-    } catch (Exception e) {
-      //ignore
-    }
-    return response.toString();
   }
 
   @NonNull
