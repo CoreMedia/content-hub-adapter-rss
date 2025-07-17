@@ -11,6 +11,7 @@
     "@jangaroo/runtime": "^1.5.0"
   },
   "devDependencies": {
+    "@coremedia/plugin-manager": "1.0.0-SNAPSHOT-3",
     "@jangaroo/build": "^3.0.2",
     "@jangaroo/core": "^3.0.2",
     "@jangaroo/publish": "^3.0.2",
@@ -23,8 +24,7 @@
     "build": "jangaroo build",
     "watch": "jangaroo watch",
     "start": "jangaroo run",
-    "package": "jangaroo package",
-    "publish": "jangaroo publish",
+    "upload-plugin": "upload-plugin ./dist --repository docker.rubin-ci-01.coremedia.vm/plugins/content-hub-adapter-rss/studio-client.main.content-hub-adapter-rss",
     "lint": "eslint --fix \"src/**/*.ts\""
   },
   "exports": {

@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "18",
-    "pnpm": "^8.6"
+    "node": ">=22"
   },
   "devDependencies": {
     "@coremedia/set-version": "^1.1.1",
@@ -17,5 +16,8 @@
   },
   "scripts": {
     "set-version": "set-version"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@coremedia/plugin-manager"]
   }
 }
